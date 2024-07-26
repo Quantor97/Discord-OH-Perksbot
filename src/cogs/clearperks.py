@@ -18,6 +18,8 @@ class ClearPerks(commands.Cog):
                 await ctx.send("Your perks have been cleared!" ,delete_after=5)
             else:
                 await ctx.send("You have no perks to clear.", delete_after=5)
+
+            await ctx.message.delete()
         except Exception as e:
             await ctx.send("An error occurred while clearing your perks.", delete_after=5)
             logger.error(f"Error clearing perks: {e}")

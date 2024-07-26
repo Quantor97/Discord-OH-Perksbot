@@ -20,7 +20,7 @@ def decode_hex_and_entities(text):
     # Decode HTML entities
     text = html.unescape(text)
     
-    return text
+    return text.replace('_x000D_', '')
 
 def scrape_perks(url):
     try:

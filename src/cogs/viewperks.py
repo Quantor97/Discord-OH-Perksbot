@@ -6,13 +6,13 @@ from database import Database
 logger = settings.logging.getLogger("bot")
 
 class PerkInfoButton(discord.ui.Button):
-    def __init__(self, perk_id, perk_name, db):
+    def __init__(self, perk_name, db):
         super().__init__(label=perk_name, style=discord.ButtonStyle.primary)
-        self.perk_id = perk_id
+        self.perk_name = perk_name
         self.db = db
 
     async def callback(self, interaction: discord.Interaction):
-        perk_info = self.db.get_perk_info(self.perk_id)
+        perk_info = self.db.get_perk_info(self.perk_name)
         if perk_info:
             embed = discord.Embed(title=perk_info['name'], color=discord.Color.blue())
             embed.add_field(name="Type", value=perk_info['type'], inline=False)

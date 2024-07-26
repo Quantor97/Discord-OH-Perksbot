@@ -66,6 +66,9 @@ def update_perks():
     if perks:
         db = Database()
         db.update_perks(perks)
+        return True
+
+    return False
 
 if __name__ == '__main__':
     update_perks()

@@ -1,0 +1,3 @@
+# Environment variables for the discord bot
+DISCORD_BOT_TOKEN=
+PERKS_EXCEL_URL=

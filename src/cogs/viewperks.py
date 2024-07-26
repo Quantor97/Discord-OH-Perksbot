@@ -32,10 +32,6 @@ class PerkNameInputModal(discord.ui.Modal):
         self.add_item(self.perk_name_input)
 
     async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("This interaction is not for you.", ephemeral=True, delete_after=10)
-            return
-
         try:
             perk_name = self.perk_name_input.value
             perks = self.db.get_users_with_perk(perk_name)
@@ -57,9 +53,15 @@ class PerkSearchView(discord.ui.View):
         super().__init__(timeout=30)
         self.db = db
         self.user_id = user_id
+        self.interaction_check = self.check_interaction
 
         # Add a dropdown for perk types
         perk_types = self.db.get_perk_types()
+
+        if not perk_types:
+            self.add_item(discord.ui.Button(label="No perks found", style=discord.ButtonStyle.danger, disabled=True))
+            return
+        
         type_options = [discord.SelectOption(label=perk_type, value=perk_type) for perk_type in perk_types]
         self.perk_type_select = discord.ui.Select(placeholder="Choose a perk type", options=type_options, max_values=1)
         self.perk_type_select.callback = self.select_type_callback
@@ -81,6 +83,9 @@ class PerkSearchView(discord.ui.View):
         view_all_button = discord.ui.Button(label="View All", style=discord.ButtonStyle.secondary)
         view_all_button.callback = self.view_all_callback
         self.add_item(view_all_button)
+
+    async def check_interaction(self, interaction: discord.Interaction):
+        return interaction.user.id == self.user_id
     
     async def on_timeout(self) -> None:
         # This method is called when the view times out
@@ -91,10 +96,6 @@ class PerkSearchView(discord.ui.View):
         await self.message.delete(delay=10)  # Deletes the message after an additional 10 seconds
 
     async def select_type_callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("This interaction is not for you.", ephemeral=True)
-            return
-
         try:
             perk_type = self.perk_type_select.values[0]
             users_with_perks = self.db.get_users_with_perk_type(perk_type)
@@ -111,10 +112,6 @@ class PerkSearchView(discord.ui.View):
             await interaction.response.send_message("An error occurred while searching for users.", ephemeral=True, delete_after=10)
 
     async def select_specialization_callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("This interaction is not for you.", ephemeral=True, delete_after=10)
-            return
-
         try:
             perk_specialization = self.perk_specialization_select.values[0]
             users_with_perks = self.db.get_users_with_perk_specialization(perk_specialization)
@@ -131,18 +128,10 @@ class PerkSearchView(discord.ui.View):
             await interaction.response.send_message("An error occurred while searching for users.", ephemeral=True, delete_after=10)
 
     async def open_name_input(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("This interaction is not for you.", ephemeral=True)
-            return
-
         modal = PerkNameInputModal(self.db, self.user_id)
         await interaction.response.send_modal(modal)
 
     async def view_all_callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("This interaction is not for you.", ephemeral=True, delete_after=10)
-            return
-
         try:
             all_users_with_perks = self.db.get_all_users_with_perks()
             if all_users_with_perks:
@@ -168,7 +157,7 @@ class ViewPerks(commands.Cog):
             view = PerkSearchView(self.db, ctx.author.id)
             await ctx.send("Select a search method and enter the required information:", view=view)
         except Exception as e:
-            logger.error(f"Error in perk command: {e}")
+            logger.error(f"Error in viewperk command: {e}")
             await ctx.send("An error occurred while setting up the search.")
 
 

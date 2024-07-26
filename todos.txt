@@ -1,0 +1,4 @@
+DB and core:
+    - Change the foreign key from 'users_perks' table to the perk's name, instead of the ID
+        - Why?: The perk's name is unique and it will ALWAYS find the corresponding record of the 'perks' table
+                No matter if the primary key of 'perks' changes due to new records or reseting, the name won't

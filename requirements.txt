@@ -1,0 +1,7 @@
+py-cord
+pandas
+openpyxl
+requests
+python-dotenv
+apscheduler
+PyNaCl

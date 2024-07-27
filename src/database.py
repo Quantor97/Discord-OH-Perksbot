@@ -107,6 +107,15 @@ class Database:
             logger.error(f"Error getting perks: {e}")
             return []
 
+    def clear_user_perks(self, user_id):
+        try:
+            # Clear all perks for a user
+            with self.conn:
+                self.c.execute("DELETE FROM user_perks WHERE user_id = ?", (user_id,))
+            logger.info(f"Cleared all perks for user {user_id}.")
+        except Exception as e:
+            logger.error(f"Error clearing perks for user {user_id}: {e}")
+
     def get_perk_info(self, perk_name):
         try:
             self.c.execute("SELECT * FROM perks WHERE perk_name = ?", (perk_name,))
@@ -125,13 +134,15 @@ class Database:
 
     def get_users_with_perk(self, perk_name):
         try:
+            like_perk = f"%{perk_name}%"
+            
             self.c.execute('''
                 SELECT users.user_name, group_concat(user_perks.perk_name) as perks 
                 FROM users
                 JOIN user_perks ON users.user_id = user_perks.user_id
-                WHERE user_perks.perk_name = ?
+                WHERE user_perks.perk_name like ?
                 GROUP BY users.user_name
-            ''', (perk_name,))
+            ''', (like_perk,))
             return [{"name": row[0], "users": row[1].split(",")} for row in self.c.fetchall()]
         except Exception as e:
             logger.error(f"Error getting users with perk: {e}")

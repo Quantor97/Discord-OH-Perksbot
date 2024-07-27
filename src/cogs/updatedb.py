@@ -12,10 +12,8 @@ class UpdateDB(commands.Cog):
         await ctx.send("Updating the database...")
         perks_updated = scraper.update_perks()
 
-        if perks_updated:
-            await ctx.send("Database updated!")
-        else :
-            await ctx.send("An error occurred while updating the database.")
+        await ctx.send("Database updated!" if perks_updated else "An error occurred while updating the database.")
+
             
 def setup(bot):
     bot.add_cog(UpdateDB(bot))

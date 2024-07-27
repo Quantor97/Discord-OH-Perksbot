@@ -100,9 +100,11 @@ class PerkSelectionView(discord.ui.View):
             if self.db.user_has_perks(self.user_id):
                 self.db.update_user_perks(self.user_id, selected_perks)
                 await interaction.response.send_message("[Info] Your perks have been updated!", ephemeral=True, delete_after=5)
+                await interaction.channel.send(f"{self.user_name} has updated their perks!")
             else:
                 self.db.add_user_perks(self.user_id, selected_perks)
                 await interaction.response.send_message("[Info] Your perks have been saved!", ephemeral=True, delete_after=5)
+                await interaction.channel.send(f"{self.user_name} has selected their perks!")
             
             await interaction.message.delete()
         except Exception as e:
